@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2, Bot, Shield, TrendingUp } from 'lucide-react';
+import heroImage from '@/assets/hero-trading-dashboard.jpg';
 
 const AuthPage = () => {
   const [loading, setLoading] = useState(false);
@@ -89,60 +90,71 @@ const AuthPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-6">
-      <div className="w-full max-w-4xl grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-        {/* Left side - Branding */}
-        <div className="text-center lg:text-left">
-          <div className="mb-8">
-            <h1 className="text-5xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-4">
+    <div className="min-h-screen flex flex-col lg:flex-row">
+      {/* Hero Image Section */}
+      <div className="lg:w-1/2 relative overflow-hidden">
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: `url(${heroImage})` }}
+        >
+          <div className="absolute inset-0 bg-gradient-to-r from-background/90 to-background/50 lg:from-background/50 lg:to-transparent" />
+        </div>
+        
+        {/* Content Overlay */}
+        <div className="relative z-10 flex flex-col justify-center h-full p-8 lg:p-12">
+          <div className="max-w-lg">
+            <h1 className="text-4xl lg:text-6xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-6">
               Binance Guardian Pro
             </h1>
-            <p className="text-xl text-muted-foreground mb-8">
+            <p className="text-xl text-foreground/90 mb-8">
               Enterprise-grade trading automation platform
             </p>
-          </div>
 
-          <div className="space-y-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-full bg-primary/10">
-                <Bot className="w-6 h-6 text-primary" />
+            <div className="space-y-6">
+              <div className="flex items-center gap-4">
+                <div className="p-3 rounded-full bg-primary/20 backdrop-blur-sm">
+                  <Bot className="w-6 h-6 text-primary" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-foreground">Automated Trading</h3>
+                  <p className="text-sm text-foreground/70">
+                    Advanced algorithms for 24/7 market opportunities
+                  </p>
+                </div>
               </div>
-              <div>
-                <h3 className="font-semibold">Automated Trading</h3>
-                <p className="text-sm text-muted-foreground">
-                  Advanced algorithms for 24/7 market opportunities
-                </p>
-              </div>
-            </div>
 
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-full bg-primary/10">
-                <Shield className="w-6 h-6 text-primary" />
+              <div className="flex items-center gap-4">
+                <div className="p-3 rounded-full bg-primary/20 backdrop-blur-sm">
+                  <Shield className="w-6 h-6 text-primary" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-foreground">Risk Management</h3>
+                  <p className="text-sm text-foreground/70">
+                    Built-in safety mechanisms and portfolio protection
+                  </p>
+                </div>
               </div>
-              <div>
-                <h3 className="font-semibold">Risk Management</h3>
-                <p className="text-sm text-muted-foreground">
-                  Built-in safety mechanisms and portfolio protection
-                </p>
-              </div>
-            </div>
 
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-full bg-primary/10">
-                <TrendingUp className="w-6 h-6 text-primary" />
-              </div>
-              <div>
-                <h3 className="font-semibold">Performance Analytics</h3>
-                <p className="text-sm text-muted-foreground">
-                  Real-time insights and comprehensive reporting
-                </p>
+              <div className="flex items-center gap-4">
+                <div className="p-3 rounded-full bg-primary/20 backdrop-blur-sm">
+                  <TrendingUp className="w-6 h-6 text-primary" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-foreground">Performance Analytics</h3>
+                  <p className="text-sm text-foreground/70">
+                    Real-time insights and comprehensive reporting
+                  </p>
+                </div>
               </div>
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Right side - Auth Form */}
-        <Card className="trading-card p-8">
+      {/* Auth Form Section */}
+      <div className="lg:w-1/2 flex items-center justify-center p-8 lg:p-12 bg-background/95 backdrop-blur-sm">
+        <div className="w-full max-w-md">
+          <Card className="trading-card p-8">
           <Tabs defaultValue="signin" className="w-full">
             <TabsList className="grid w-full grid-cols-2 mb-6">
               <TabsTrigger value="signin">Sign In</TabsTrigger>
@@ -250,12 +262,13 @@ const AuthPage = () => {
             </TabsContent>
           </Tabs>
 
-          <div className="mt-6 text-center text-sm text-muted-foreground">
-            <p>
-              By signing in, you agree to our Terms of Service and Privacy Policy
-            </p>
-          </div>
-        </Card>
+            <div className="mt-6 text-center text-sm text-muted-foreground">
+              <p>
+                By signing in, you agree to our Terms of Service and Privacy Policy
+              </p>
+            </div>
+          </Card>
+        </div>
       </div>
     </div>
   );
