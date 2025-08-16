@@ -14,7 +14,131 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          full_name: string | null
+          id: string
+          risk_tolerance: string | null
+          trading_experience: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          risk_tolerance?: string | null
+          trading_experience?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          risk_tolerance?: string | null
+          trading_experience?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      trades: {
+        Row: {
+          bot_id: string | null
+          created_at: string
+          executed_at: string | null
+          id: string
+          pnl: number | null
+          price: number
+          quantity: number
+          side: string
+          status: string | null
+          symbol: string
+          user_id: string
+        }
+        Insert: {
+          bot_id?: string | null
+          created_at?: string
+          executed_at?: string | null
+          id?: string
+          pnl?: number | null
+          price: number
+          quantity: number
+          side: string
+          status?: string | null
+          symbol: string
+          user_id: string
+        }
+        Update: {
+          bot_id?: string | null
+          created_at?: string
+          executed_at?: string | null
+          id?: string
+          pnl?: number | null
+          price?: number
+          quantity?: number
+          side?: string
+          status?: string | null
+          symbol?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trades_bot_id_fkey"
+            columns: ["bot_id"]
+            isOneToOne: false
+            referencedRelation: "trading_bots"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trading_bots: {
+        Row: {
+          config: Json | null
+          created_at: string
+          id: string
+          name: string
+          status: string | null
+          strategy: string
+          total_profit: number | null
+          total_trades: number | null
+          updated_at: string
+          user_id: string
+          win_rate: number | null
+        }
+        Insert: {
+          config?: Json | null
+          created_at?: string
+          id?: string
+          name: string
+          status?: string | null
+          strategy: string
+          total_profit?: number | null
+          total_trades?: number | null
+          updated_at?: string
+          user_id: string
+          win_rate?: number | null
+        }
+        Update: {
+          config?: Json | null
+          created_at?: string
+          id?: string
+          name?: string
+          status?: string | null
+          strategy?: string
+          total_profit?: number | null
+          total_trades?: number | null
+          updated_at?: string
+          user_id?: string
+          win_rate?: number | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
