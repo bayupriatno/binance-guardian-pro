@@ -2,41 +2,65 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* Professional Trading Platform Design System */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Professional Dark Theme */
+    --background: 220 15% 8%;
+    --foreground: 45 100% 95%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card: 220 15% 10%;
+    --card-foreground: 45 100% 95%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover: 220 15% 12%;
+    --popover-foreground: 45 100% 95%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Gold Premium Accent */
+    --primary: 45 100% 55%;
+    --primary-foreground: 220 15% 8%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 220 15% 15%;
+    --secondary-foreground: 45 100% 95%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 220 15% 18%;
+    --muted-foreground: 45 20% 70%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 45 80% 35%;
+    --accent-foreground: 45 100% 95%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    /* Trading Colors */
+    --profit: 120 60% 45%;
+    --profit-foreground: 120 60% 95%;
+    
+    --loss: 0 75% 55%;
+    --loss-foreground: 0 75% 95%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --destructive: 0 75% 55%;
+    --destructive-foreground: 0 75% 95%;
 
-    --radius: 0.5rem;
+    --border: 220 15% 20%;
+    --input: 220 15% 15%;
+    --ring: 45 100% 55%;
+
+    --radius: 0.75rem;
+
+    /* Premium Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(45 100% 45%));
+    --gradient-card: linear-gradient(145deg, hsl(var(--card)), hsl(220 15% 12%));
+    --gradient-profit: linear-gradient(135deg, hsl(var(--profit)), hsl(120 60% 35%));
+    --gradient-loss: linear-gradient(135deg, hsl(var(--loss)), hsl(0 75% 45%));
+
+    /* Professional Shadows */
+    --shadow-premium: 0 20px 40px -10px hsl(var(--primary) / 0.1);
+    --shadow-card: 0 10px 30px -5px hsl(220 15% 5% / 0.3);
+    --shadow-glow: 0 0 20px hsl(var(--primary) / 0.15);
+
+    /* Animation Variables */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-fast: all 0.15s ease;
+
+    --radius: 0.75rem;
 
     --sidebar-background: 0 0% 98%;
 
@@ -92,6 +116,7 @@ All colors MUST be HSL.
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
+  }
 }
 
 @layer base {
@@ -100,6 +125,75 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-mono;
+    background: linear-gradient(135deg, hsl(var(--background)), hsl(220 15% 6%));
+  }
+}
+
+@layer components {
+  /* Professional Trading Components */
+  .trading-card {
+    @apply bg-card border border-border rounded-lg;
+    background: var(--gradient-card);
+    box-shadow: var(--shadow-card);
+    transition: var(--transition-smooth);
+  }
+
+  .trading-card:hover {
+    box-shadow: var(--shadow-premium);
+    transform: translateY(-2px);
+  }
+
+  .profit-text {
+    @apply text-profit font-semibold;
+  }
+
+  .loss-text {
+    @apply text-loss font-semibold;
+  }
+
+  .premium-button {
+    background: var(--gradient-primary);
+    box-shadow: var(--shadow-glow);
+    transition: var(--transition-smooth);
+  }
+
+  .premium-button:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-premium);
+  }
+
+  .data-grid {
+    @apply font-mono text-sm;
+  }
+
+  .animate-pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite alternate;
+  }
+
+  @keyframes pulse-glow {
+    from {
+      box-shadow: 0 0 10px hsl(var(--primary) / 0.2);
+    }
+    to {
+      box-shadow: 0 0 20px hsl(var(--primary) / 0.4);
+    }
+  }
+
+  .market-ticker {
+    @apply overflow-hidden whitespace-nowrap;
+  }
+
+  .market-ticker-content {
+    animation: scroll-left 30s linear infinite;
+  }
+
+  @keyframes scroll-left {
+    0% {
+      transform: translateX(100%);
+    }
+    100% {
+      transform: translateX(-100%);
+    }
   }
 }
