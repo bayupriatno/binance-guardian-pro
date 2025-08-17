@@ -10,6 +10,9 @@ import BotConfiguration from './BotConfiguration';
 import MarketData from './MarketData';
 import PortfolioManager from './PortfolioManager';
 import TradingHistory from './TradingHistory';
+import OrderManagement from './OrderManagement';
+import AlertsManager from './AlertsManager';
+import AutomatedStrategies from './AutomatedStrategies';
 import { 
   TrendingUp, 
   TrendingDown, 
@@ -93,10 +96,13 @@ const TradingDashboard = () => {
       </div>
 
       <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="grid w-full grid-cols-5 mb-6">
+        <TabsList className="grid w-full grid-cols-8 mb-6">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="portfolio">Portfolio</TabsTrigger>
           <TabsTrigger value="market">Market</TabsTrigger>
+          <TabsTrigger value="orders">Orders</TabsTrigger>
+          <TabsTrigger value="strategies">Strategies</TabsTrigger>
+          <TabsTrigger value="alerts">Alerts</TabsTrigger>
           <TabsTrigger value="history">History</TabsTrigger>
           <TabsTrigger value="bots">Bots</TabsTrigger>
         </TabsList>
@@ -290,6 +296,18 @@ const TradingDashboard = () => {
 
         <TabsContent value="market">
           <MarketData />
+        </TabsContent>
+
+        <TabsContent value="orders">
+          <OrderManagement />
+        </TabsContent>
+
+        <TabsContent value="strategies">
+          <AutomatedStrategies />
+        </TabsContent>
+
+        <TabsContent value="alerts">
+          <AlertsManager />
         </TabsContent>
 
         <TabsContent value="history">

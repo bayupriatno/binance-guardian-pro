@@ -14,6 +14,120 @@ export type Database = {
   }
   public: {
     Tables: {
+      alerts: {
+        Row: {
+          bot_id: string | null
+          condition_type: string
+          created_at: string
+          current_value: number | null
+          enabled: boolean | null
+          id: string
+          message: string | null
+          symbol: string | null
+          target_value: number
+          title: string
+          triggered: boolean | null
+          triggered_at: string | null
+          type: string
+          user_id: string
+        }
+        Insert: {
+          bot_id?: string | null
+          condition_type: string
+          created_at?: string
+          current_value?: number | null
+          enabled?: boolean | null
+          id?: string
+          message?: string | null
+          symbol?: string | null
+          target_value: number
+          title: string
+          triggered?: boolean | null
+          triggered_at?: string | null
+          type: string
+          user_id: string
+        }
+        Update: {
+          bot_id?: string | null
+          condition_type?: string
+          created_at?: string
+          current_value?: number | null
+          enabled?: boolean | null
+          id?: string
+          message?: string | null
+          symbol?: string | null
+          target_value?: number
+          title?: string
+          triggered?: boolean | null
+          triggered_at?: string | null
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      orders: {
+        Row: {
+          avg_fill_price: number | null
+          bot_id: string | null
+          commission: number | null
+          created_at: string
+          executed_at: string | null
+          filled_quantity: number | null
+          id: string
+          order_id: string | null
+          price: number | null
+          quantity: number
+          side: string
+          status: string
+          stop_price: number | null
+          symbol: string
+          time_in_force: string | null
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avg_fill_price?: number | null
+          bot_id?: string | null
+          commission?: number | null
+          created_at?: string
+          executed_at?: string | null
+          filled_quantity?: number | null
+          id?: string
+          order_id?: string | null
+          price?: number | null
+          quantity: number
+          side: string
+          status?: string
+          stop_price?: number | null
+          symbol: string
+          time_in_force?: string | null
+          type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avg_fill_price?: number | null
+          bot_id?: string | null
+          commission?: number | null
+          created_at?: string
+          executed_at?: string | null
+          filled_quantity?: number | null
+          id?: string
+          order_id?: string | null
+          price?: number | null
+          quantity?: number
+          side?: string
+          status?: string
+          stop_price?: number | null
+          symbol?: string
+          time_in_force?: string | null
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -136,6 +250,45 @@ export type Database = {
           updated_at?: string
           user_id?: string
           win_rate?: number | null
+        }
+        Relationships: []
+      }
+      trading_strategies: {
+        Row: {
+          active: boolean | null
+          config: Json
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          performance: Json | null
+          strategy_type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          active?: boolean | null
+          config?: Json
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          performance?: Json | null
+          strategy_type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          active?: boolean | null
+          config?: Json
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          performance?: Json | null
+          strategy_type?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
