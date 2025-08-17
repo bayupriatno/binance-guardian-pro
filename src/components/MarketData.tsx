@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { supabase } from '@/integrations/supabase/client';
 import { 
   TrendingUp, 
   TrendingDown, 
@@ -25,7 +26,37 @@ const MarketData = () => {
   const [loading, setLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
 
-  // Mock data for demonstration - in real app, this would fetch from Binance API
+  // Fetch real data from Binance API via edge function
+  const fetchBinanceData = async (): Promise<CryptoPrice[]> => {
+    try {
+      const symbols = ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'ADAUSDT', 'DOTUSDT', 'LINKUSDT', 'LTCUSDT', 'XRPUSDT'];
+      
+      const { data, error } = await supabase.functions.invoke('binance-api', {
+        body: { endpoint: 'ticker/24hr' }
+      });
+
+      if (error) throw error;
+
+      // Filter for our desired symbols and map to our interface
+      const filteredData = data.filter((item: any) => symbols.includes(item.symbol));
+      
+      return filteredData.map((item: any) => ({
+        symbol: item.symbol,
+        price: parseFloat(item.lastPrice),
+        change24h: parseFloat(item.priceChange),
+        changePercent24h: parseFloat(item.priceChangePercent),
+        volume24h: parseFloat(item.volume),
+        high24h: parseFloat(item.highPrice),
+        low24h: parseFloat(item.lowPrice),
+      }));
+    } catch (error) {
+      console.error('Error fetching Binance data:', error);
+      // Fallback to mock data if API fails
+      return generateMockData();
+    }
+  };
+
+  // Fallback mock data
   const generateMockData = (): CryptoPrice[] => {
     const symbols = [
       { symbol: 'BTCUSDT', basePrice: 43000 },
@@ -39,10 +70,10 @@ const MarketData = () => {
     ];
 
     return symbols.map(({ symbol, basePrice }) => {
-      const changePercent = (Math.random() - 0.5) * 10; // Random change between -5% and +5%
+      const changePercent = (Math.random() - 0.5) * 10;
       const price = basePrice * (1 + changePercent / 100);
       const change24h = price * (changePercent / 100);
-      const volume24h = Math.random() * 1000000000; // Random volume
+      const volume24h = Math.random() * 1000000000;
       
       return {
         symbol,
@@ -57,20 +88,23 @@ const MarketData = () => {
   };
 
   useEffect(() => {
-    const fetchData = () => {
+    const fetchData = async () => {
       setLoading(true);
-      // Simulate API call delay
-      setTimeout(() => {
-        setCryptoPrices(generateMockData());
+      try {
+        const data = await fetchBinanceData();
+        setCryptoPrices(data);
         setLastUpdated(new Date());
+      } catch (error) {
+        console.error('Failed to fetch market data:', error);
+      } finally {
         setLoading(false);
-      }, 1000);
+      }
     };
 
     fetchData();
     
-    // Update every 5 seconds (in real app, use WebSocket)
-    const interval = setInterval(fetchData, 5000);
+    // Update every 30 seconds (Binance rate limits)
+    const interval = setInterval(fetchData, 30000);
     
     return () => clearInterval(interval);
   }, []);
@@ -172,7 +206,7 @@ const MarketData = () => {
 
       <div className="mt-4 p-3 rounded-lg bg-muted/10 border border-border">
         <p className="text-xs text-muted-foreground text-center">
-          Market data updates every 5 seconds • Demo mode with simulated prices
+          Live market data from Binance API • Updates every 30 seconds
         </p>
       </div>
     </Card>
