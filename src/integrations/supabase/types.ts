@@ -67,6 +67,7 @@ export type Database = {
       }
       orders: {
         Row: {
+          auto_tp_sl_enabled: boolean | null
           avg_fill_price: number | null
           bot_id: string | null
           commission: number | null
@@ -79,14 +80,17 @@ export type Database = {
           quantity: number
           side: string
           status: string
+          stop_loss_price: number | null
           stop_price: number | null
           symbol: string
+          take_profit_price: number | null
           time_in_force: string | null
           type: string
           updated_at: string
           user_id: string
         }
         Insert: {
+          auto_tp_sl_enabled?: boolean | null
           avg_fill_price?: number | null
           bot_id?: string | null
           commission?: number | null
@@ -99,14 +103,17 @@ export type Database = {
           quantity: number
           side: string
           status?: string
+          stop_loss_price?: number | null
           stop_price?: number | null
           symbol: string
+          take_profit_price?: number | null
           time_in_force?: string | null
           type: string
           updated_at?: string
           user_id: string
         }
         Update: {
+          auto_tp_sl_enabled?: boolean | null
           avg_fill_price?: number | null
           bot_id?: string | null
           commission?: number | null
@@ -119,8 +126,10 @@ export type Database = {
           quantity?: number
           side?: string
           status?: string
+          stop_loss_price?: number | null
           stop_price?: number | null
           symbol?: string
+          take_profit_price?: number | null
           time_in_force?: string | null
           type?: string
           updated_at?: string
@@ -287,6 +296,51 @@ export type Database = {
           name?: string
           performance?: Json | null
           strategy_type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_settings: {
+        Row: {
+          auto_tp_sl_enabled: boolean | null
+          auto_trading_enabled: boolean | null
+          binance_api_key: string | null
+          binance_secret_key: string | null
+          created_at: string
+          default_stop_loss_percent: number | null
+          default_take_profit_percent: number | null
+          id: string
+          max_daily_trades: number | null
+          max_position_size: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          auto_tp_sl_enabled?: boolean | null
+          auto_trading_enabled?: boolean | null
+          binance_api_key?: string | null
+          binance_secret_key?: string | null
+          created_at?: string
+          default_stop_loss_percent?: number | null
+          default_take_profit_percent?: number | null
+          id?: string
+          max_daily_trades?: number | null
+          max_position_size?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          auto_tp_sl_enabled?: boolean | null
+          auto_trading_enabled?: boolean | null
+          binance_api_key?: string | null
+          binance_secret_key?: string | null
+          created_at?: string
+          default_stop_loss_percent?: number | null
+          default_take_profit_percent?: number | null
+          id?: string
+          max_daily_trades?: number | null
+          max_position_size?: number | null
           updated_at?: string
           user_id?: string
         }

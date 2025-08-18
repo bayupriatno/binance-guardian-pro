@@ -13,11 +13,13 @@ import TradingHistory from './TradingHistory';
 import OrderManagement from './OrderManagement';
 import AlertsManager from './AlertsManager';
 import AutomatedStrategies from './AutomatedStrategies';
+import Settings from './Settings';
+import AutoTrader from './AutoTrader';
 import { 
   TrendingUp, 
   TrendingDown, 
   Bot, 
-  Settings, 
+  Settings as SettingsIcon, 
   Activity,
   DollarSign,
   BarChart3,
@@ -29,6 +31,7 @@ import {
 const TradingDashboard = () => {
   const { toast } = useToast();
   const [showBotConfig, setShowBotConfig] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -79,8 +82,8 @@ const TradingDashboard = () => {
             <p className="text-muted-foreground mt-2">Enterprise Trading Bot Platform</p>
           </div>
           <div className="flex gap-3">
-            <Button variant="outline" size="sm">
-              <Settings className="w-4 h-4 mr-2" />
+            <Button variant="outline" size="sm" onClick={() => setShowSettings(true)}>
+              <SettingsIcon className="w-4 h-4 mr-2" />
               Settings
             </Button>
             <Button variant="premium" size="sm" onClick={() => setShowBotConfig(true)}>
@@ -96,7 +99,7 @@ const TradingDashboard = () => {
       </div>
 
       <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="grid w-full grid-cols-8 mb-6">
+        <TabsList className="grid w-full grid-cols-9 mb-6">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="portfolio">Portfolio</TabsTrigger>
           <TabsTrigger value="market">Market</TabsTrigger>
@@ -105,6 +108,7 @@ const TradingDashboard = () => {
           <TabsTrigger value="alerts">Alerts</TabsTrigger>
           <TabsTrigger value="history">History</TabsTrigger>
           <TabsTrigger value="bots">Bots</TabsTrigger>
+          <TabsTrigger value="autotrader">Auto Trader</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview">
@@ -325,10 +329,18 @@ const TradingDashboard = () => {
             </Button>
           </div>
         </TabsContent>
+
+        <TabsContent value="autotrader">
+          <AutoTrader />
+        </TabsContent>
       </Tabs>
 
       {showBotConfig && (
         <BotConfiguration onClose={() => setShowBotConfig(false)} />
+      )}
+
+      {showSettings && (
+        <Settings onClose={() => setShowSettings(false)} />
       )}
     </div>
   );
