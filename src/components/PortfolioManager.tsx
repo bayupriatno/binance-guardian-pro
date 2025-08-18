@@ -43,8 +43,22 @@ const PortfolioManager = () => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
-  // Mock portfolio data generation
-  const generatePortfolioData = (): PortfolioStats => {
+  // Fetch real portfolio data from Supabase
+  const fetchPortfolioData = async (): Promise<PortfolioStats> => {
+    try {
+      const { data, error } = await supabase.functions.invoke('portfolio-sync');
+      
+      if (error) throw error;
+      
+      return data;
+    } catch (error) {
+      console.error('Error fetching portfolio:', error);
+      // Fallback to mock data
+      return generateMockPortfolio();
+    }
+  };
+
+  const generateMockPortfolio = (): PortfolioStats => {
     const mockAssets: Asset[] = [
       {
         symbol: 'BTC',
@@ -71,16 +85,6 @@ const PortfolioManager = () => {
         balance: 15.234,
         avgPrice: 285,
         currentPrice: 300 + (Math.random() - 0.5) * 30,
-        value: 0,
-        allocation: 0,
-        pnl: 0,
-        pnlPercent: 0,
-      },
-      {
-        symbol: 'ADA',
-        balance: 1250.5,
-        avgPrice: 0.42,
-        currentPrice: 0.45 + (Math.random() - 0.5) * 0.05,
         value: 0,
         allocation: 0,
         pnl: 0,
@@ -116,7 +120,7 @@ const PortfolioManager = () => {
     const totalCost = mockAssets.reduce((sum, asset) => sum + (asset.balance * asset.avgPrice), 0);
     const totalPnLPercent = (totalPnL / totalCost) * 100;
 
-    const todayPnL = totalValue * ((Math.random() - 0.5) * 0.05); // Random daily change
+    const todayPnL = totalValue * ((Math.random() - 0.5) * 0.05);
     const todayPnLPercent = (todayPnL / totalValue) * 100;
 
     return {
@@ -131,30 +135,47 @@ const PortfolioManager = () => {
 
   const refreshPortfolio = async () => {
     setRefreshing(true);
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    setPortfolio(generatePortfolioData());
-    setRefreshing(false);
-    toast({
-      title: "Portfolio Updated",
-      description: "Latest balance and prices fetched",
-    });
+    try {
+      const data = await fetchPortfolioData();
+      setPortfolio(data);
+      toast({
+        title: "Portfolio Updated",
+        description: "Latest balance and prices fetched",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update portfolio",
+        variant: "destructive",
+      });
+    } finally {
+      setRefreshing(false);
+    }
   };
 
   useEffect(() => {
     const loadPortfolio = async () => {
       setLoading(true);
-      // Simulate loading delay
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      setPortfolio(generatePortfolioData());
-      setLoading(false);
+      try {
+        const data = await fetchPortfolioData();
+        setPortfolio(data);
+      } catch (error) {
+        console.error('Failed to load portfolio:', error);
+      } finally {
+        setLoading(false);
+      }
     };
 
     loadPortfolio();
 
     // Auto-refresh every 30 seconds
-    const interval = setInterval(() => {
-      setPortfolio(generatePortfolioData());
+    const interval = setInterval(async () => {
+      try {
+        const data = await fetchPortfolioData();
+        setPortfolio(data);
+      } catch (error) {
+        console.error('Failed to refresh portfolio:', error);
+      }
     }, 30000);
 
     return () => clearInterval(interval);

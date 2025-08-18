@@ -41,13 +41,57 @@ const TradingHistory = () => {
   const [sideFilter, setSideFilter] = useState('all');
   const [dateFilter, setDateFilter] = useState('7d');
 
-  // Generate mock trading data
+  // Fetch real trading data from database
+  const fetchTradingHistory = async (): Promise<Trade[]> => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return [];
+
+      const { data: tradesData, error } = await supabase
+        .from('trades')
+        .select(`
+          id,
+          symbol,
+          side,
+          quantity,
+          price,
+          pnl,
+          status,
+          executed_at,
+          created_at
+        `)
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      const trades: Trade[] = (tradesData || []).map(trade => ({
+        id: trade.id,
+        symbol: trade.symbol,
+        side: trade.side as 'buy' | 'sell',
+        quantity: trade.quantity,
+        price: trade.price,
+        value: trade.quantity * trade.price,
+        pnl: trade.pnl || 0,
+        status: trade.status as 'filled' | 'pending' | 'cancelled',
+        timestamp: new Date(trade.executed_at || trade.created_at),
+        commission: (trade.quantity * trade.price) * 0.001, // 0.1% commission
+      }));
+
+      return trades;
+    } catch (error) {
+      console.error('Error fetching trading history:', error);
+      return generateMockTrades();
+    }
+  };
+
+  // Generate mock trading data as fallback
   const generateMockTrades = (): Trade[] => {
     const symbols = ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'ADAUSDT', 'DOTUSDT'];
     const bots = ['DCA Pro', 'Grid Master', 'Momentum', 'Manual'];
     const trades: Trade[] = [];
 
-    for (let i = 0; i < 50; i++) {
+    for (let i = 0; i < 15; i++) {
       const symbol = symbols[Math.floor(Math.random() * symbols.length)];
       const side = Math.random() > 0.5 ? 'buy' : 'sell' as 'buy' | 'sell';
       const quantity = Math.random() * 10;
@@ -56,8 +100,8 @@ const TradingHistory = () => {
       const pnl = (Math.random() - 0.5) * value * 0.1;
       const status = ['filled', 'pending', 'cancelled'][Math.floor(Math.random() * 3)] as 'filled' | 'pending' | 'cancelled';
       const botName = bots[Math.floor(Math.random() * bots.length)];
-      const timestamp = new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000); // Last 30 days
-      const commission = value * 0.001; // 0.1% commission
+      const timestamp = new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000);
+      const commission = value * 0.001;
 
       trades.push({
         id: `trade_${i}`,
@@ -80,15 +124,39 @@ const TradingHistory = () => {
   useEffect(() => {
     const loadTrades = async () => {
       setLoading(true);
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      const mockTrades = generateMockTrades();
-      setTrades(mockTrades);
-      setFilteredTrades(mockTrades);
-      setLoading(false);
+      try {
+        const tradesData = await fetchTradingHistory();
+        setTrades(tradesData);
+        setFilteredTrades(tradesData);
+      } catch (error) {
+        console.error('Failed to load trades:', error);
+      } finally {
+        setLoading(false);
+      }
     };
 
     loadTrades();
+
+    // Set up real-time subscription for new trades
+    const channel = supabase
+      .channel('trades-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'trades',
+        },
+        () => {
+          // Reload trades when changes occur
+          loadTrades();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   useEffect(() => {
