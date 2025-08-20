@@ -15,6 +15,9 @@ import AlertsManager from './AlertsManager';
 import AutomatedStrategies from './AutomatedStrategies';
 import Settings from './Settings';
 import AutoTrader from './AutoTrader';
+import BotManagement from './BotManagement';
+import AITradingSignals from './AITradingSignals';
+import BotAnalytics from './BotAnalytics';
 import { 
   TrendingUp, 
   TrendingDown, 
@@ -156,7 +159,7 @@ const TradingDashboard = () => {
       </div>
 
       <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="grid w-full grid-cols-9 mb-6">
+        <TabsList className="grid w-full grid-cols-11 mb-6">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="portfolio">Portfolio</TabsTrigger>
           <TabsTrigger value="market">Market</TabsTrigger>
@@ -164,8 +167,10 @@ const TradingDashboard = () => {
           <TabsTrigger value="strategies">Strategies</TabsTrigger>
           <TabsTrigger value="alerts">Alerts</TabsTrigger>
           <TabsTrigger value="history">History</TabsTrigger>
-          <TabsTrigger value="bots">Bots</TabsTrigger>
+          <TabsTrigger value="bots">Bot Manager</TabsTrigger>
           <TabsTrigger value="autotrader">Auto Trader</TabsTrigger>
+          <TabsTrigger value="ai-signals">AI Signals</TabsTrigger>
+          <TabsTrigger value="analytics">Analytics</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview">
@@ -376,19 +381,19 @@ const TradingDashboard = () => {
         </TabsContent>
 
         <TabsContent value="bots">
-          <div className="text-center p-8">
-            <Bot className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-            <h3 className="text-xl font-semibold mb-2">Bot Management</h3>
-            <p className="text-muted-foreground mb-4">Create and manage your trading bots</p>
-            <Button variant="premium" onClick={() => setShowBotConfig(true)}>
-              <Bot className="w-4 h-4 mr-2" />
-              Create New Bot
-            </Button>
-          </div>
+          <BotManagement />
         </TabsContent>
 
         <TabsContent value="autotrader">
           <AutoTrader />
+        </TabsContent>
+
+        <TabsContent value="ai-signals">
+          <AITradingSignals />
+        </TabsContent>
+
+        <TabsContent value="analytics">
+          <BotAnalytics />
         </TabsContent>
       </Tabs>
 
