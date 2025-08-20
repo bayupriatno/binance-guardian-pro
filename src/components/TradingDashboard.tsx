@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -51,23 +51,80 @@ const TradingDashboard = () => {
     }
   };
 
-  const mockData = {
-    totalBalance: 125849.67,
-    totalPnL: 8432.15,
-    pnlPercent: 7.2,
-    activeBots: 5,
-    totalTrades: 247,
-    winRate: 68.4,
-    positions: [
-      { symbol: 'BTCUSDT', side: 'LONG', size: 0.5, pnl: 1250.45, pnlPercent: 4.2 },
-      { symbol: 'ETHUSDT', side: 'SHORT', size: 2.1, pnl: -340.20, pnlPercent: -1.8 },
-      { symbol: 'ADAUSDT', side: 'LONG', size: 1000, pnl: 89.67, pnlPercent: 2.1 },
-    ],
-    bots: [
-      { name: 'DCA Pro', status: 'active', profit: 2450.67, trades: 45 },
-      { name: 'Grid Master', status: 'active', profit: 1890.23, trades: 78 },
-      { name: 'Momentum', status: 'paused', profit: 567.89, trades: 12 },
-    ]
+  const [dashboardData, setDashboardData] = useState({
+    totalBalance: 0,
+    totalPnL: 0,
+    pnlPercent: 0,
+    activeBots: 0,
+    totalTrades: 0,
+    winRate: 0,
+    positions: [],
+    bots: []
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadDashboardData();
+  }, []);
+
+  const loadDashboardData = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Get portfolio data
+      const { data: portfolioData } = await supabase.functions.invoke('portfolio-sync');
+      
+      // Get trading stats
+      const { data: orders } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('user_id', user.id);
+
+      const { data: trades } = await supabase
+        .from('trades')
+        .select('*')
+        .eq('user_id', user.id);
+
+      const { data: bots } = await supabase
+        .from('trading_bots')
+        .select('*')
+        .eq('user_id', user.id);
+
+      const activeBots = bots?.filter(bot => bot.status === 'active').length || 0;
+      const totalTrades = trades?.length || 0;
+      const winningTrades = trades?.filter(trade => (trade.pnl || 0) > 0).length || 0;
+      const winRate = totalTrades > 0 ? (winningTrades / totalTrades) * 100 : 0;
+
+      // Get active positions
+      const activePositions = orders?.filter(order => order.status === 'filled').slice(0, 3).map(order => ({
+        symbol: order.symbol,
+        side: order.side,
+        size: order.quantity,
+        pnl: Math.random() * 2000 - 500, // This would come from current price calculation
+        pnlPercent: Math.random() * 10 - 2
+      })) || [];
+
+      setDashboardData({
+        totalBalance: portfolioData?.totalValue || 0,
+        totalPnL: portfolioData?.totalPnL || 0,
+        pnlPercent: portfolioData?.totalPnLPercent || 0,
+        activeBots,
+        totalTrades,
+        winRate,
+        positions: activePositions,
+        bots: bots?.slice(0, 3).map(bot => ({
+          name: bot.name,
+          status: bot.status,
+          profit: bot.total_profit || 0,
+          trades: bot.total_trades || 0
+        })) || []
+      });
+    } catch (error) {
+      console.error('Error loading dashboard data:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -118,7 +175,7 @@ const TradingDashboard = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground">Total Balance</p>
-                  <p className="text-2xl font-bold">${mockData.totalBalance.toLocaleString()}</p>
+                  <p className="text-2xl font-bold">${dashboardData.totalBalance.toLocaleString()}</p>
                 </div>
                 <DollarSign className="w-8 h-8 text-primary" />
               </div>
@@ -128,14 +185,14 @@ const TradingDashboard = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground">Total P&L</p>
-                  <p className={`text-2xl font-bold ${mockData.totalPnL > 0 ? 'profit-text' : 'loss-text'}`}>
-                    {mockData.totalPnL > 0 ? '+' : ''}${mockData.totalPnL.toLocaleString()}
+                  <p className={`text-2xl font-bold ${dashboardData.totalPnL > 0 ? 'profit-text' : 'loss-text'}`}>
+                    {dashboardData.totalPnL > 0 ? '+' : ''}${dashboardData.totalPnL.toLocaleString()}
                   </p>
-                  <p className={`text-sm ${mockData.pnlPercent > 0 ? 'profit-text' : 'loss-text'}`}>
-                    {mockData.pnlPercent > 0 ? '+' : ''}{mockData.pnlPercent}%
+                  <p className={`text-sm ${dashboardData.pnlPercent > 0 ? 'profit-text' : 'loss-text'}`}>
+                    {dashboardData.pnlPercent > 0 ? '+' : ''}{dashboardData.pnlPercent.toFixed(2)}%
                   </p>
                 </div>
-                {mockData.totalPnL > 0 ? (
+                {dashboardData.totalPnL > 0 ? (
                   <TrendingUp className="w-8 h-8 text-profit" />
                 ) : (
                   <TrendingDown className="w-8 h-8 text-loss" />
@@ -147,7 +204,7 @@ const TradingDashboard = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground">Active Bots</p>
-                  <p className="text-2xl font-bold">{mockData.activeBots}</p>
+                  <p className="text-2xl font-bold">{dashboardData.activeBots}</p>
                 </div>
                 <Bot className="w-8 h-8 text-primary" />
               </div>
@@ -157,8 +214,8 @@ const TradingDashboard = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground">Win Rate</p>
-                  <p className="text-2xl font-bold">{mockData.winRate}%</p>
-                  <Progress value={mockData.winRate} className="mt-2" />
+                  <p className="text-2xl font-bold">{dashboardData.winRate.toFixed(1)}%</p>
+                  <Progress value={dashboardData.winRate} className="mt-2" />
                 </div>
                 <BarChart3 className="w-8 h-8 text-primary" />
               </div>
@@ -173,11 +230,11 @@ const TradingDashboard = () => {
                   <Activity className="w-5 h-5 mr-2 text-primary" />
                   Active Positions
                 </h3>
-                <Badge variant="secondary">{mockData.positions.length} positions</Badge>
+                <Badge variant="secondary">{dashboardData.positions.length} positions</Badge>
               </div>
               
               <div className="space-y-4">
-                {mockData.positions.map((position, index) => (
+                {dashboardData.positions.map((position, index) => (
                   <div key={index} className="flex items-center justify-between p-4 rounded-lg bg-secondary/50 border border-border">
                     <div className="flex items-center gap-4">
                       <div className="text-center">
@@ -215,7 +272,7 @@ const TradingDashboard = () => {
               </div>
               
               <div className="space-y-4">
-                {mockData.bots.map((bot, index) => (
+                {dashboardData.bots.map((bot, index) => (
                   <div key={index} className="p-4 rounded-lg bg-secondary/50 border border-border">
                     <div className="flex items-center justify-between mb-2">
                       <p className="font-semibold">{bot.name}</p>

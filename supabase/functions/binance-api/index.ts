@@ -12,11 +12,13 @@ Deno.serve(async (req) => {
   }
 
   try {
+    // Get API keys from environment secrets
     const apiKey = Deno.env.get('BINANCE_API_KEY');
     const apiSecret = Deno.env.get('BINANCE_SECRET_KEY');
 
     if (!apiKey || !apiSecret) {
-      throw new Error('Binance API credentials not configured');
+      console.warn('Using fallback: Binance API credentials not configured in environment');
+      // For public endpoints, we can continue without API key
     }
 
     const url = new URL(req.url);
@@ -30,11 +32,12 @@ Deno.serve(async (req) => {
     }
 
     // For public endpoints, no signature required
-    const response = await fetch(apiUrl, {
-      headers: {
-        'X-MBX-APIKEY': apiKey,
-      },
-    });
+    const headers: Record<string, string> = {};
+    if (apiKey) {
+      headers['X-MBX-APIKEY'] = apiKey;
+    }
+
+    const response = await fetch(apiUrl, { headers });
 
     if (!response.ok) {
       throw new Error(`Binance API error: ${response.status} ${response.statusText}`);
