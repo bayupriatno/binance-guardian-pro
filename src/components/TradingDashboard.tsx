@@ -18,6 +18,8 @@ import AutoTrader from './AutoTrader';
 import BotManagement from './BotManagement';
 import AITradingSignals from './AITradingSignals';
 import BotAnalytics from './BotAnalytics';
+import GridTradingSpot from './GridTradingSpot';
+import GridTradingFutures from './GridTradingFutures';
 import { 
   TrendingUp, 
   TrendingDown, 
@@ -159,7 +161,7 @@ const TradingDashboard = () => {
       </div>
 
       <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="grid w-full grid-cols-11 mb-6">
+        <TabsList className="grid w-full grid-cols-13 mb-6">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="portfolio">Portfolio</TabsTrigger>
           <TabsTrigger value="market">Market</TabsTrigger>
@@ -169,6 +171,8 @@ const TradingDashboard = () => {
           <TabsTrigger value="history">History</TabsTrigger>
           <TabsTrigger value="bots">Bot Manager</TabsTrigger>
           <TabsTrigger value="autotrader">Auto Trader</TabsTrigger>
+          <TabsTrigger value="grid-spot">Grid Spot</TabsTrigger>
+          <TabsTrigger value="grid-futures">Grid Futures</TabsTrigger>
           <TabsTrigger value="ai-signals">AI Signals</TabsTrigger>
           <TabsTrigger value="analytics">Analytics</TabsTrigger>
         </TabsList>
@@ -386,6 +390,14 @@ const TradingDashboard = () => {
 
         <TabsContent value="autotrader">
           <AutoTrader />
+        </TabsContent>
+
+        <TabsContent value="grid-spot">
+          <GridTradingSpot />
+        </TabsContent>
+
+        <TabsContent value="grid-futures">
+          <GridTradingFutures />
         </TabsContent>
 
         <TabsContent value="ai-signals">
